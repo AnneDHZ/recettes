@@ -161,8 +161,8 @@ WHERE r.id_recette NOT IN (
     WHERE i.nomIngredient IS NULL
 );
 
-cette requette me renvoi toutes les recettes sans exception
-OU 
+-- cette requette me renvoi toutes les recettes sans exception
+-- OU 
 
 SELECT r.nomRecette
 FROM recette r
@@ -172,7 +172,7 @@ LEFT JOIN ingredient i
 ON ir.id_ingredient = i.id_ingredient
 WHERE ir.id_ingredient IS NULL;
 
-cette requette me renvoi uniquement la recette eau chaude
+-- cette requette me renvoi uniquement la recette eau chaude
 
 
 -- 18 Trouver les ingrédients qui sont utilisés dans au moins 3 recettes
@@ -183,16 +183,25 @@ ON i.id_ingredient = ir.id_ingredient
 GROUP BY i.nomIngredient
 HAVING COUNT(DISTINCT ir.id_recette) >= 3;
 
-renvoi id 21 nom oeufs
+-- renvoi id 21 nom oeufs
 
 -- 19 Ajouter un nouvel ingrédient à une recette spécifique
-UPDATE ingredient i
-SET i.nomIngredient = 'boeuf'
-INNER JOIN recette r
-ON r.id_ingredient = i.id_ingredient
+
+INSERT INTO ingredient (nomIngredient, prix)
+VALUES ('Choux', 1.5);
+
+INSERT INTO ingredientparrecette (id_ingredient, id_recette, quantite, uniteMesure)
+SELECT i.id_ingredient, 10, 0.5, 'kg'  
+FROM ingredient i
+WHERE i.nomIngredient = 'choux';
+
+-- pour vérifier
+SELECT  nomIngredient
+FROM ingredient i
+INNER JOIN ingredientparrecette ir
+ON i.id_ingredient = ir.id_ingredient
 WHERE id_recette = 10;
 
-pb...a corriger
 
 -- 20 Bonus : Trouver la recette la plus coûteuse de la base de données (il peut y avoir des ex aequo, il est 
 -- donc exclu d’utiliser la clause LIMIT)
