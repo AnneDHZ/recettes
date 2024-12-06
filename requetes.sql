@@ -94,7 +94,7 @@ GROUP BY nomIngredient, quantite
 
 
 
--- 10 Ajouter un ingrédient en base de données : Poivre, unité : cuillère à café, prix : 2.5 €
+-- 10 Ajouter un ingrédient en base de données : Poivre, unité : gramme, prix : 2.5 €
 INSERT INTO ingredient (nomIngredient, prix)
 VALUES ('Poivre', 2.5);
 
@@ -205,3 +205,74 @@ WHERE id_recette = 10;
 
 -- 20 Bonus : Trouver la recette la plus coûteuse de la base de données (il peut y avoir des ex aequo, il est 
 -- donc exclu d’utiliser la clause LIMIT)
+
+Pour chaque recette,  multiplier le prix de chaque ingrédient par la quantité utilisée 
+additionner les résultats pour chaque recette.
+Nous allons ensuite chercher la recette avec le prix total le plus élevé.
+
+--> 
+SELECT r.nomRecette
+FROM recette r
+WHERE MAX(
+SELECT SUM(i.prix * ir.quantite) AS prixTotal
+FROM ingredient i
+INNER JOIN ingredientparrecette ir
+ON i.id_ingredient = ir.id_ingredient
+GROUP BY prixTotal  
+);
+
+en cherchant mieux
+
+SELECT r.nomRecette -- on demande le nom de la recette
+FROM recette r -- dans la table recette
+WHERE (  --où
+    SELECT SUM(i.prix * ir.quantite) AS prixTotal   --le prix total par recette alias prixTotal
+    FROM ingredient i   -- de la table ingredient
+    INNER JOIN ingredientparrecette ir  -- join avec la table ingredient par recette
+    ON i.id_ingredient = ir.id_ingredient
+    WHERE ir.id_recette = r.id_recette  -- où les id_recette sont identiques entre les tables
+) = (  -- comparaison avec le prix total de chaque recette une par une
+    SELECT MAX(prixTotal)   
+    FROM (  --dans
+        SELECT SUM(i.prix * ir.quantite) AS prixTotal   
+        FROM ingredient i
+        INNER JOIN ingredientparrecette ir
+        ON i.id_ingredient = ir.id_ingredient
+        GROUP BY ir.id_recette
+    ) AS prix_totaux
+);
+
+-- OU
+
+WITH RecettePrixTotal AS (
+    SELECT r.id_recette, r.nomRecette, SUM(ir.quantite * i.prix) AS prixTotal
+    FROM ingredientparrecette ir
+    JOIN ingredient i ON ir.id_ingredient = i.id_ingredient
+    JOIN recette r 
+    ON ir.id_recette = r.id_recette
+    GROUP BY r.id_recette, r.nomRecette
+)
+SELECT *
+FROM RecettePrixTotal
+WHERE prixTotal = (SELECT MAX(prixTotal) FROM RecettePrixTotal);
+
+--OU
+
+SELECT r.id_recette, r.nomRecette, SUM(ir.quantite * i.prix) AS prixTotal
+FROM ingredientparrecette ir
+JOIN ingredient i 
+ON ir.id_ingredient = i.id_ingredient
+JOIN recette r 
+ON ir.id_recette = r.id_recette
+GROUP BY r.id_recette, r.nomRecette
+HAVING SUM(ir.quantite * i.prix) = (
+        SELECT MAX(totalPrix)
+        FROM ( 
+            SELECT SUM(ir.quantite * i.prix) AS totalPrix
+            FROM ingredientparrecette ir
+            JOIN ingredient i 
+            ON ir.id_ingredient = i.id_ingredient
+            GROUP BY ir.id_recette
+        ) AS MaxPrix
+    );
+
