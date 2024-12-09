@@ -208,27 +208,15 @@ WHERE id_recette = 10;
 
 Pour chaque recette,  multiplier le prix de chaque ingrédient par la quantité utilisée 
 additionner les résultats pour chaque recette.
-Nous allons ensuite chercher la recette avec le prix total le plus élevé.
+chercher la recette avec le prix total le plus élevé.
 
---> 
-SELECT r.nomRecette
-FROM recette r
-WHERE MAX(
-SELECT SUM(i.prix * ir.quantite) AS prixTotal
-FROM ingredient i
-INNER JOIN ingredientparrecette ir
-ON i.id_ingredient = ir.id_ingredient
-GROUP BY prixTotal  
-);
-
-en cherchant mieux
 
 SELECT r.nomRecette -- on demande le nom de la recette
 FROM recette r -- dans la table recette
 WHERE (  --où
     SELECT SUM(i.prix * ir.quantite) AS prixTotal   --le prix total par recette alias prixTotal
     FROM ingredient i   -- de la table ingredient
-    INNER JOIN ingredientparrecette ir  -- join avec la table ingredient par recette
+    INNER JOIN ingredientparrecette ir  -- joint avec la table ingredient par recette
     ON i.id_ingredient = ir.id_ingredient
     WHERE ir.id_recette = r.id_recette  -- où les id_recette sont identiques entre les tables
 ) = (  -- comparaison avec le prix total de chaque recette une par une
@@ -244,17 +232,17 @@ WHERE (  --où
 
 -- OU
 
-WITH RecettePrixTotal AS (
+WITH RecettePrixTotal AS (   -- table temporaire nommée RecettePrixTotal
     SELECT r.id_recette, r.nomRecette, SUM(ir.quantite * i.prix) AS prixTotal
     FROM ingredientparrecette ir
     JOIN ingredient i ON ir.id_ingredient = i.id_ingredient
     JOIN recette r 
     ON ir.id_recette = r.id_recette
     GROUP BY r.id_recette, r.nomRecette
-)
+)  -- calcul le prix total de chaque recette
 SELECT *
 FROM RecettePrixTotal
-WHERE prixTotal = (SELECT MAX(prixTotal) FROM RecettePrixTotal);
+WHERE prixTotal = (SELECT MAX(prixTotal) FROM RecettePrixTotal); -- comparaison de chaque prix total et renvoi le maximum
 
 --OU
 
@@ -265,7 +253,7 @@ ON ir.id_ingredient = i.id_ingredient
 JOIN recette r 
 ON ir.id_recette = r.id_recette
 GROUP BY r.id_recette, r.nomRecette
-HAVING SUM(ir.quantite * i.prix) = (
+HAVING SUM(ir.quantite * i.prix) = (  
         SELECT MAX(totalPrix)
         FROM ( 
             SELECT SUM(ir.quantite * i.prix) AS totalPrix
@@ -275,4 +263,6 @@ HAVING SUM(ir.quantite * i.prix) = (
             GROUP BY ir.id_recette
         ) AS MaxPrix
     );
+
+
 
