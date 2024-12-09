@@ -7,19 +7,20 @@ SELECT r.nomRecette, r.tempsPrepa, c.nomCategorie
 FROM recette r
 INNER JOIN categorie c
 ON r.id_categorie = c.id_categorie
+GROUPE BY r.id_recette DESC;
 
 -- 2 En modifiant la requête précédente, faites apparaître le nombre d’ingrédients nécessaire par recette
 SELECT COUNT(ir.id_ingredient) AS nbIngredient, nomRecette
 FROM ingredientparrecette ir
 INNER JOIN recette r
 ON r.id_recette = ir.id_recette
-GROUP BY nomRecette
+GROUP BY r.id_recette;
 
 
 -- 3 Afficher les recettes qui nécessitent au moins 30 min de préparation
 SELECT r.nomRecette, r.tempsPrepa
 FROM recette r
-WHERE r.tempsPrepa >= 30
+WHERE r.tempsPrepa >= 30;
 
 
 
@@ -58,12 +59,14 @@ WHERE id_recette=3;
 
 -- 7 Supprimer la recette n°15 de la base de données
 
-DELETE recette FROM recette r
-INNER JOIN ingredientparrecette ir
-ON r.id_recette = ir.id_recette
-INNER JOIN ingredient i
-ON ir.id_ingredient = i.id_ingredient
+DELETE ingredientparrecette
+FROM ingredientparrecette ir
+WHERE ir.id_recette = 15;
+
+DELETE recette 
+FROM recette r
 WHERE r.id_recette = 15;
+
 
 trouvé dans la documentation cette méthode mais reste à approfondir  
 ALTER TABLE  ingredientparrecette ir
@@ -90,7 +93,7 @@ INNER JOIN ingredientparrecette ir
 ON i.id_ingredient = ir.id_ingredient
 WHERE id_recette = 5;
 
-GROUP BY nomIngredient, quantite
+GROUP BY id_ingredient;
 
 
 
@@ -264,5 +267,24 @@ HAVING SUM(ir.quantite * i.prix) = (
         ) AS MaxPrix
     );
 
+OU
 
+--prendre les recettes avec les jointures
+SELECT r.id_recette, r.nomRecette, SUM(ir.quantite * i.prix) AS prixTotal
+FROM ingredientparrecette ir
+JOIN ingredient i 
+ON ir.id_ingredient = i.id_ingredient
+JOIN recette r 
+ON ir.id_recette = r.id_recette
+-- les grouper par ordre
+GROUP BY r.id_recette, r.nomRecette
+-- où la somme des quantité *prix est supérieur à TOUTES les autres
+HAVING SUM(ir.quantite * i.prix) >= ALL (
+-- dans la somme de chaque recette alias totalPrix
+    SELECT SUM(ir.quantite * i.prix) AS totalPrix
+    FROM ingredientparrecette ir
+    JOIN ingredient i 
+    ON ir.id_ingredient = i.id_ingredient
+    GROUP BY ir.id_recette
+);
 
