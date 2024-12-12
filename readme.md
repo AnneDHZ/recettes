@@ -1,22 +1,19 @@
 Recettes
 
-ðŸŽ¯ Objectifs pÃ©dagogiques
+🎯 Objectifs pédagogiques
 
-Comprendre SQL
+Comprendre SQL et faire la liaison avec PHP
 
-ðŸ“ Consignes
+📝 Consignes
 
-crÃ©er une base de donnÃ©es sur HeidiSQL
-faire des requÃªtes SQL
+Créer une base de données, faire les requetes en fonction des besoins et lier la base de données avec PHP
 
-ðŸ”§ Technologies utilisÃ©es
+🔧 Technologies utilisées
 
 HeidiSQL
+PHP
+HTML
 
-ðŸ’¡ Concepts clÃ©s abordÃ©s
+📚 Ressources
 
-requetes SQL
-
-ðŸ“š Ressources
-
-Exercice rÃ©alisÃ© dans le cadre de la formation DWWM Elan formation
+Exercice réalisé dans le cadre de la formation DWWM Elan formation
