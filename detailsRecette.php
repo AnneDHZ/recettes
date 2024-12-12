@@ -82,4 +82,4 @@ $prixTotal = $declarationRecette->fetch();
     <p><?= $recette['instructions']; ?></p>
 
    
-    <a href="recettes.php" class="lien">retour vers recettes</a><br>
+    <a href="recettes.php" class="lien">retour vers les recettes</a><br>
