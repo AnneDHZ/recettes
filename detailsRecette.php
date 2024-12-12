@@ -51,7 +51,7 @@ $prixTotal = $declarationRecette->fetch();
 
 <?php    
         if ($prixTotal["prixTotal"]) { ?>
-            <p>prix total : <?= $prixTotal['prixTotal']; ?> €, oui c'est cher</p><br>            
+            <p>prix total : <?= $prixTotal['prixTotal']; ?> €, oui c'est cher...</p><br>            
 <?php }
         else {
             echo 'elle est gratuite';
@@ -64,16 +64,16 @@ $prixTotal = $declarationRecette->fetch();
     <ul>
 
 <?php
-    if (count($infos) > 0) {
-        foreach ($infos as $info){  ?>
-            <li>
-                <?= $info['nomIngredient'] ?>, <?= $info['quantite'] ?> <?= $info['uniteMesure'] ?> à <?= $info['prix'] ?> €
-            </li>
-        <?php }
-    }
-    else {
-        echo 'Il n\'y a pas d\'ingrédient pour cette recette';
-    }
+        if (count($infos) > 0) {
+            foreach ($infos as $info){  ?>
+                <li>
+                    <?= $info['nomIngredient'] ?>, <?= $info['quantite'] ?> <?= $info['uniteMesure'] ?> à <?= $info['prix'] ?> €
+                </li>
+            <?php }
+        }
+        else {
+            echo 'Il n\'y a pas d\'ingrédient pour cette recette';
+        }
 ?>
     </ul>
     
